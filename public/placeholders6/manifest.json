@@ -1,0 +1,56 @@
+[
+  {
+    "name": "product_01",
+    "src": "public/placeholders6/product_01.svg",
+    "width": 640,
+    "height": 360,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  },
+  {
+    "name": "product_02",
+    "src": "public/placeholders6/product_02.svg",
+    "width": 640,
+    "height": 360,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  },
+  {
+    "name": "product_03",
+    "src": "public/placeholders6/product_03.svg",
+    "width": 640,
+    "height": 360,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  },
+  {
+    "name": "product_04",
+    "src": "public/placeholders6/product_04.svg",
+    "width": 640,
+    "height": 360,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  },
+  {
+    "name": "product_06",
+    "src": "public/placeholders6/product_06.svg",
+    "width": 640,
+    "height": 360,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  },
+  {
+    "name": "product_05",
+    "src": "public/placeholders6/product_05.svg",
+    "width": 640,
+    "height": 360,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  }
+]

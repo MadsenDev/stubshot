@@ -1,0 +1,11 @@
+[
+  {
+    "name": "product_01",
+    "src": "public/placeholders4/product_01.svg",
+    "width": 400,
+    "height": 300,
+    "theme": "noise",
+    "provider": "local",
+    "format": "svg"
+  }
+]

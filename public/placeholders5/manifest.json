@@ -1,0 +1,11 @@
+[
+  {
+    "name": "product_01",
+    "src": "public/placeholders5/product_01.svg",
+    "width": 320,
+    "height": 240,
+    "theme": "blobs",
+    "provider": "local",
+    "format": "svg"
+  }
+]

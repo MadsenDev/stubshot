@@ -1,0 +1,39 @@
+{
+  "name": "stubshot",
+  "version": "0.1.0",
+  "description": "Generate deterministic local placeholder images",
+  "keywords": [
+    "placeholder",
+    "images",
+    "fixtures",
+    "assets",
+    "cli"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "stubshot": "dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.json && node ./scripts/fix-shebang.mjs",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node ./dist/bin.js"
+  },
+  "dependencies": {
+    "@stubshot/core": "workspace:^",
+    "@stubshot/provider-local": "workspace:^",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "product_01",
+    "src": "public/placeholders3/product_01.svg",
+    "width": 1200,
+    "height": 800,
+    "theme": "geometric",
+    "provider": "local",
+    "format": "svg"
+  },
+  {
+    "name": "product_02",
+    "src": "public/placeholders3/product_02.svg",
+    "width": 1200,
+    "height": 800,
+    "theme": "geometric",
+    "provider": "local",
+    "format": "svg"
+  }
+]
