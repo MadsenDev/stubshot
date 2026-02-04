@@ -16,6 +16,7 @@ test("validateConfig rejects invalid count", () => {
         padding: 2,
         startIndex: 1,
         seed: "seed",
+        cache: true,
         dryRun: true,
         overwrite: false,
         silent: true,
@@ -38,6 +39,7 @@ test("validateConfig accepts minimal config shape", () => {
       padding: 2,
       startIndex: 1,
       seed: "seed",
+      cache: true,
       dryRun: true,
       overwrite: false,
       silent: true,
@@ -46,4 +48,3 @@ test("validateConfig accepts minimal config shape", () => {
     }),
   );
 });
-

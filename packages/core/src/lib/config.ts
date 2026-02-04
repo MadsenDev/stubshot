@@ -13,6 +13,9 @@ export type StubshotConfig = {
   startIndex: number;
   seed: string;
   manifest?: string | boolean;
+  baseUrl?: string;
+  cacheDir?: string;
+  cache: boolean;
   dryRun: boolean;
   overwrite: boolean;
   silent: boolean;

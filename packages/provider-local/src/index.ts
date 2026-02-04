@@ -249,17 +249,24 @@ async function generateSvg(input: StubshotProviderGenerateInput): Promise<Buffer
 export const provider: StubshotProvider = {
   name: "local",
   supports: {
-    formats: ["svg"],
+    formats: ["svg", "png", "jpg", "jpeg", "webp"],
     deterministic: true,
   },
   async generate(input) {
     const fmt = input.format.toLowerCase();
-    if (fmt !== "svg") {
-      throw new Error(
-        `@stubshot/provider-local only supports SVG in v0 (requested: ${input.format}).`,
-      );
-    }
-    return generateSvg(input);
+    const svgBuffer = await generateSvg(input);
+    if (fmt === "svg") return svgBuffer;
+
+    // Raster formats are rendered from the deterministic SVG.
+    // sharp is intentionally only imported when needed.
+    const { default: sharp } = await import("sharp");
+    const pipeline = sharp(svgBuffer, { density: 144 });
+
+    if (fmt === "png") return pipeline.png().toBuffer();
+    if (fmt === "jpg" || fmt === "jpeg") return pipeline.jpeg({ quality: 85 }).toBuffer();
+    if (fmt === "webp") return pipeline.webp({ quality: 80 }).toBuffer();
+
+    throw new Error(`Unsupported format: ${input.format}`);
   },
 };
 

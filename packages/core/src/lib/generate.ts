@@ -7,6 +7,7 @@ import { parseAspectRatio, parseSizes } from "./parse.js";
 import { toPosixPath } from "./path.js";
 import { createLogger } from "./log.js";
 import { validateConfig } from "./validate.js";
+import { cacheEntryFor, computeCacheKey, readCache, writeCache } from "./cache.js";
 import type { StubshotConfig, StubshotConfigOverrides } from "./config.js";
 
 type Size = { width: number; height: number };
@@ -27,6 +28,9 @@ function applyDefaults(value: Partial<StubshotConfig>): StubshotConfig {
     startIndex: value.startIndex ?? 1,
     seed: value.seed ?? "stubshot",
     manifest: value.manifest,
+    baseUrl: value.baseUrl,
+    cacheDir: value.cacheDir,
+    cache: value.cache ?? true,
     dryRun: value.dryRun ?? false,
     overwrite: value.overwrite ?? false,
     silent: value.silent ?? false,
@@ -68,6 +72,10 @@ export async function generate(cliOverrides: StubshotConfigOverrides = {}): Prom
   const log = createLogger({ silent: config.silent, verbose: config.verbose });
 
   const provider = await loadProvider(config.provider);
+  const cacheDirAbs =
+    config.cache && config.cacheDir && config.cacheDir.trim().length > 0
+      ? path.resolve(process.cwd(), config.cacheDir)
+      : undefined;
 
   const requestedFormat = config.format.toLowerCase();
   const supportedFormats = provider.supports.formats.map((f) => String(f).toLowerCase());
@@ -108,6 +116,10 @@ export async function generate(cliOverrides: StubshotConfigOverrides = {}): Prom
   const manifest: Array<Record<string, unknown>> = [];
   const failures: Array<{ name: string; error: Error }> = [];
 
+  const baseUrl = config.baseUrl?.trim();
+  const normalizedBaseUrl =
+    baseUrl && baseUrl.length > 0 ? baseUrl.replace(/\/+$/, "") : undefined;
+
   async function generateOne(task: { size: Size; index: number }): Promise<void> {
     const name = `${config.prefix}_${padIndex(task.index, config.padding)}`;
     const filename = `${name}.${ext}`;
@@ -128,22 +140,60 @@ export async function generate(cliOverrides: StubshotConfigOverrides = {}): Prom
     }
 
     const perImageSeed = `${config.seed}:${config.theme}:${config.format}:${task.size.width}x${task.size.height}:${task.index}`;
-    const buffer = await provider.generate({
+    const providerInput = {
       width: task.size.width,
       height: task.size.height,
       seed: perImageSeed,
       theme: config.theme,
       index: task.index,
       format: config.format,
-    });
+    };
+    Object.freeze(providerInput);
+
+    let buffer: Buffer | undefined;
+    let cacheHit = false;
+    let cacheEntry: ReturnType<typeof cacheEntryFor> | undefined;
+
+    if (cacheDirAbs && !config.dryRun) {
+      const key = computeCacheKey({
+        providerId: config.provider,
+        providerName: provider.name,
+        theme: config.theme,
+        format: config.format,
+        width: task.size.width,
+        height: task.size.height,
+        seed: perImageSeed,
+      });
+      cacheEntry = cacheEntryFor(cacheDirAbs, key, config.format);
+      buffer = await readCache(cacheEntry);
+      cacheHit = buffer !== undefined;
+      if (cacheHit) {
+        log.debug(`cache hit ${name}`);
+      }
+    }
+
+    if (!buffer) {
+      buffer = await provider.generate(providerInput);
+      if (cacheEntry && !config.dryRun) {
+        try {
+          await writeCache(cacheEntry, buffer);
+        } catch (err) {
+          log.debug(`cache write failed for ${name}: ${(err as Error).message}`);
+        }
+      }
+    }
 
     if (!config.dryRun) await fs.writeFile(filePathAbs, buffer);
-    log.info(`${config.dryRun ? "[dry-run] " : ""}wrote ${toPosixPath(path.relative(process.cwd(), filePathAbs))}`);
+    log.info(
+      `${config.dryRun ? "[dry-run] " : ""}${cacheHit ? "[cache] " : ""}wrote ${toPosixPath(
+        path.relative(process.cwd(), filePathAbs),
+      )}`,
+    );
 
     if (shouldWriteManifest) {
       manifest.push({
         name,
-        src: toPosixPath(path.relative(process.cwd(), filePathAbs)),
+        src: normalizedBaseUrl ? `${normalizedBaseUrl}/${filename}` : toPosixPath(path.relative(process.cwd(), filePathAbs)),
         width: task.size.width,
         height: task.size.height,
         theme: config.theme,

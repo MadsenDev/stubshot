@@ -1,16 +1,8 @@
 {
-  "name": "@stubshot/provider-local",
+  "name": "@stubshot/provider-openai",
   "version": "0.1.2",
-  "description": "Deterministic local Stubshot provider (offline SVG themes)",
+  "description": "BYOK OpenAI Stubshot provider (image generation)",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MadsenDev/stubshot.git"
-  },
-  "bugs": {
-    "url": "https://github.com/MadsenDev/stubshot/issues"
-  },
-  "homepage": "https://github.com/MadsenDev/stubshot#readme",
   "type": "module",
   "exports": {
     ".": "./dist/index.js"
@@ -23,9 +15,6 @@
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {
-    "sharp": "^0.33.5"
-  },
   "scripts": {
     "prebuild": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "tsc -p tsconfig.json",
@@ -35,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
+    "@stubshot/core": "workspace:*",
     "typescript": "^5.5.4"
   }
 }

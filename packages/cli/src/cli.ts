@@ -1,11 +1,110 @@
 import { Command } from "commander";
 import { createRequire } from "node:module";
 
-import { generate } from "@stubshot/core";
+import { generate, loadProvider } from "@stubshot/core";
 import type { StubshotConfig } from "@stubshot/core";
 
 const require = createRequire(import.meta.url);
 const pkg = require("../package.json") as { version?: string };
+
+function bashCompletionScript(): string {
+  // Minimal static completion for stubshot. Keep in sync with CLI options.
+  return `# bash completion for stubshot
+_stubshot_completions() {
+  local cur prev words cword
+  _init_completion -n : || return
+
+  local commands="generate providers completion help"
+  local global_opts="--help -h --version -V"
+
+  if [[ $cword -eq 1 ]]; then
+    COMPREPLY=( $(compgen -W "$commands $global_opts" -- "$cur") )
+    return
+  fi
+
+  case "\${words[1]}" in
+    generate)
+      local opts="--provider --out --count --sizes --width --height --aspect --theme --format --prefix --padding --start-index --seed --manifest --base-url --cache-dir --no-cache --dry-run --overwrite --concurrency --silent --verbose --help -h"
+      COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+      ;;
+    providers)
+      local opts="--json --help -h"
+      COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+      ;;
+    completion)
+      local opts="bash zsh --help -h"
+      COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+      ;;
+    *)
+      COMPREPLY=( $(compgen -W "$global_opts" -- "$cur") )
+      ;;
+  esac
+}
+complete -F _stubshot_completions stubshot
+`;
+}
+
+function zshCompletionScript(): string {
+  return `#compdef stubshot
+
+_stubshot() {
+  local -a commands
+  commands=(
+    'generate:Generate placeholder images'
+    'providers:List known providers'
+    'completion:Print shell completion script'
+    'help:Show help'
+  )
+
+  _arguments -C \\
+    '1:command:->cmds' \\
+    '*::arg:->args'
+
+  case $state in
+    cmds)
+      _describe 'command' commands
+      ;;
+    args)
+      case $words[2] in
+        generate)
+          _arguments \\
+            '--provider[Provider name]' \\
+            '--out[Output directory]' \\
+            '--count[How many images per size]' \\
+            '--sizes[Comma-separated sizes like 1200x800,800x800]' \\
+            '--width[Width in pixels]' \\
+            '--height[Height in pixels]' \\
+            '--aspect[Aspect ratio like 16:9]' \\
+            '--theme[Theme name]' \\
+            '--format[Output format]' \\
+            '--prefix[Filename prefix]' \\
+            '--padding[Zero-padding digits]' \\
+            '--start-index[Starting index]' \\
+            '--seed[Seed for deterministic output]' \\
+            '--manifest[Write a JSON manifest]' \\
+            '--base-url[Base URL for manifest src]' \\
+            '--cache-dir[Disk cache directory]' \\
+            '--no-cache[Disable disk cache]' \\
+            '--dry-run[Do not write files]' \\
+            '--overwrite[Allow overwriting]' \\
+            '--concurrency[Max parallel generations]' \\
+            '--silent[No output]' \\
+            '--verbose[Verbose output]'
+          ;;
+        providers)
+          _arguments '--json[Output as JSON]'
+          ;;
+        completion)
+          _values 'shell' bash zsh
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_stubshot
+`;
+}
 
 function parseIntOption(value: string): number {
   const parsed = Number.parseInt(value, 10);
@@ -39,6 +138,9 @@ export async function main(argv: string[]): Promise<void> {
     .option("--start-index <n>", "Starting index", parseIntOption)
     .option("--seed <seed>", "Seed for deterministic output")
     .option("--manifest [path]", "Write a JSON manifest (default: manifest.json in --out)")
+    .option("--base-url <path>", "Base URL path for manifest src (e.g. /placeholders)")
+    .option("--cache-dir <dir>", "Disk cache directory (stores provider outputs)")
+    .option("--no-cache", "Disable disk cache (even if cacheDir is set)")
     .option("--dry-run", "Plan output but do not write files", false)
     .option("--overwrite", "Allow overwriting existing files", false)
     .option("--concurrency <n>", "Max parallel image generations", parseIntOption)
@@ -66,13 +168,98 @@ export async function main(argv: string[]): Promise<void> {
       setIfCli("startIndex", "startIndex", opts.startIndex);
       setIfCli("seed", "seed", opts.seed);
       setIfCli("manifest", "manifest", opts.manifest);
+      setIfCli("baseUrl", "baseUrl", opts.baseUrl);
+      setIfCli("cacheDir", "cacheDir", opts.cacheDir);
+      setIfCli("cache", "cache", opts.cache);
       setIfCli("dryRun", "dryRun", opts.dryRun);
       setIfCli("overwrite", "overwrite", opts.overwrite);
       setIfCli("concurrency", "concurrency", opts.concurrency);
       setIfCli("silent", "silent", opts.silent);
       setIfCli("verbose", "verbose", opts.verbose);
 
+      // Friendly warnings for higher-cost/non-deterministic flows.
+      const provider = (overrides.provider as string | undefined) ?? "local";
+      const isOpenAI = provider === "openai" || provider === "@stubshot/provider-openai";
+      const hasCacheDir =
+        typeof overrides.cacheDir === "string" && overrides.cacheDir.trim().length > 0;
+      const cacheEnabled = overrides.cache !== false;
+
+      if (!overrides.silent && isOpenAI) {
+        if (!hasCacheDir && cacheEnabled) {
+          console.warn(
+            `stubshot: warn: OpenAI provider is non-deterministic; consider --cache-dir to avoid repeat costs.`,
+          );
+        }
+        if (process.env.STUBSHOT_OPENAI_MAX_IMAGES === undefined) {
+          console.warn(
+            `stubshot: warn: Consider setting STUBSHOT_OPENAI_MAX_IMAGES as a cost guardrail.`,
+          );
+        }
+      }
+
       await generate(overrides);
+    });
+
+  program
+    .command("providers")
+    .description("List known provider names and whether they are installed")
+    .option("--json", "Output as JSON", false)
+    .action(async (opts) => {
+      const known = ["local", "openai"];
+      const results: Array<{ name: string; installed: boolean; packageHint: string; error?: string }> = [];
+
+      for (const name of known) {
+        try {
+          const provider = await loadProvider(name);
+          results.push({
+            name,
+            installed: true,
+            packageHint: `@stubshot/provider-${name}`,
+          });
+          if (!opts.json) {
+            // Touch a couple fields to ensure the provider is valid.
+            void provider.supports;
+          }
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          results.push({
+            name,
+            installed: false,
+            packageHint: `@stubshot/provider-${name}`,
+            error: message,
+          });
+        }
+      }
+
+      if (opts.json) {
+        console.log(JSON.stringify(results, null, 2));
+        return;
+      }
+
+      for (const r of results) {
+        if (r.installed) {
+          console.log(`${r.name}\tinstalled`);
+        } else {
+          console.log(`${r.name}\tmissing (install ${r.packageHint})`);
+        }
+      }
+    });
+
+  program
+    .command("completion")
+    .description("Print shell completion script")
+    .argument("<shell>", "Shell name (bash|zsh)")
+    .action((shell: string) => {
+      const s = shell.toLowerCase();
+      if (s === "bash") {
+        console.log(bashCompletionScript());
+        return;
+      }
+      if (s === "zsh") {
+        console.log(zshCompletionScript());
+        return;
+      }
+      throw new Error(`Unsupported shell: ${shell} (expected bash or zsh)`);
     });
 
   await program.parseAsync(argv);

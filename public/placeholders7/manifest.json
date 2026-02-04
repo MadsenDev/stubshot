@@ -1,0 +1,11 @@
+[
+  {
+    "name": "product_01",
+    "src": "/placeholders/product_01.svg",
+    "width": 320,
+    "height": 240,
+    "theme": "mesh-gradient",
+    "provider": "local",
+    "format": "svg"
+  }
+]

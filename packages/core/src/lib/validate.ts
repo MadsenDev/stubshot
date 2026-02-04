@@ -32,6 +32,16 @@ export function validateConfig(config: StubshotConfig): void {
     errors.push(`"manifest" must be true, false, or a non-empty string path`);
   }
 
+  if (config.baseUrl !== undefined && !isNonEmptyString(config.baseUrl)) {
+    errors.push(`"baseUrl" must be a non-empty string when provided`);
+  }
+
+  if (config.cacheDir !== undefined && !isNonEmptyString(config.cacheDir)) {
+    errors.push(`"cacheDir" must be a non-empty string when provided`);
+  }
+
+  if (typeof config.cache !== "boolean") errors.push(`"cache" must be boolean`);
+
   if (typeof config.dryRun !== "boolean") errors.push(`"dryRun" must be boolean`);
   if (typeof config.overwrite !== "boolean") errors.push(`"overwrite" must be boolean`);
   if (typeof config.silent !== "boolean") errors.push(`"silent" must be boolean`);

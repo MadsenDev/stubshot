@@ -56,9 +56,11 @@
 * [x] `--start-index`
 * [x] `--seed`
 * [x] `--manifest`
+* [x] `--base-url`
 * [x] `--dry-run`
 * [x] `--overwrite` (added)
 * [x] `--silent` / `--verbose` (added)
+* [x] `--concurrency` (added)
 
 ---
 
@@ -68,7 +70,7 @@
 * [x] Dynamic import of provider module
 * [x] Validate provider interface
 * [x] Friendly error when provider is missing
-* [ ] List available providers command (optional)
+* [x] List available providers command (optional)
 
 ---
 
@@ -131,10 +133,10 @@
 
 ### Provider constraints
 
-* [ ] Stateless execution
-* [ ] No filesystem writes
-* [ ] No CLI parsing
-* [ ] Pure input → output
+* [x] Stateless execution
+* [x] No filesystem writes
+* [x] No CLI parsing
+* [x] Pure input → output
 
 ---
 
@@ -151,10 +153,10 @@
 
 ### Image generation engine
 
-* [ ] Decide tech:
+* [x] Decide tech:
 
   * SVG-only
-  * Canvas (node-canvas / skia)
+  * Raster via `sharp`
 * [x] Seeded random generator
 * [x] Color palette generation
 * [x] Deterministic layout logic
@@ -181,9 +183,9 @@ Each theme:
 ### Output formats
 
 * [x] SVG generation
-* [ ] PNG rendering
-* [ ] JPG rendering
-* [ ] WebP rendering
+* [x] PNG rendering
+* [x] JPG rendering
+* [x] WebP rendering
 
 ---
 
@@ -191,35 +193,35 @@ Each theme:
 
 ### Setup
 
-* [ ] Separate package
-* [ ] Peer dependency on `@stubshot/core`
-* [ ] Environment-based API key loading
+* [x] Separate package
+* [x] Peer dependency on `@stubshot/core`
+* [x] Environment-based API key loading
 
 ---
 
 ### Prompt system
 
-* [ ] Prompt template per theme
-* [ ] Inject size, theme, index
-* [ ] Avoid photorealism by default
+* [x] Prompt template per theme
+* [x] Inject size, theme, index
+* [x] Avoid photorealism by default
 
 ---
 
 ### API integration
 
-* [ ] Image generation call
-* [ ] Error handling
-* [ ] Rate limiting
-* [ ] Retry strategy
-* [ ] Cost-awareness logging
+* [x] Image generation call
+* [x] Error handling
+* [x] Rate limiting
+* [x] Retry strategy
+* [x] Cost-awareness logging
 
 ---
 
 ### Caching (important)
 
-* [ ] Cache by `(seed + size + theme)`
-* [ ] Optional disk cache
-* [ ] Avoid regenerating identical images
+* [x] Cache by `(seed + size + theme)`
+* [x] Optional disk cache
+* [x] Avoid regenerating identical images
 
 ---
 
@@ -227,18 +229,19 @@ Each theme:
 
 ### Core tests
 
-* [ ] CLI argument parsing tests
-* [ ] Config merging tests
-* [ ] Provider resolution tests
-* [ ] Deterministic output tests
+* [x] CLI argument parsing tests
+* [x] Config merging tests
+* [x] Provider resolution tests
+* [x] Deterministic output tests
+* [x] CI workflow runs build/tests
 
 ---
 
 ### Provider tests
 
-* [ ] Local provider snapshot tests
-* [ ] Determinism verification
-* [ ] Format support tests
+* [x] Local provider snapshot tests
+* [x] Determinism verification
+* [x] Format support tests
 
 ---
 
@@ -246,31 +249,31 @@ Each theme:
 
 ### README
 
-* [ ] What Stubshot is
-* [ ] Installation
-* [ ] Basic usage
-* [ ] Config file example
-* [ ] Provider system overview
-* [ ] Determinism explanation
+* [x] What Stubshot is
+* [x] Installation
+* [x] Basic usage
+* [x] Config file example
+* [x] Provider system overview
+* [x] Determinism explanation
 
 ---
 
 ### Advanced docs
 
-* [ ] Provider authoring guide
-* [ ] BYOK security notes
-* [ ] CI usage examples
-* [ ] Monorepo contribution guide
+* [x] Provider authoring guide
+* [x] BYOK security notes
+* [x] CI usage examples
+* [x] Monorepo contribution guide
 
 ---
 
 ## 7. DX & Polish
 
-* [ ] Shell autocomplete (optional)
-* [ ] Zsh/Bash completion
-* [ ] Prettier + ESLint config
-* [ ] Consistent error formatting
-* [ ] Friendly warnings (non-fatal)
+* [x] Shell autocomplete (optional)
+* [x] Zsh/Bash completion
+* [x] Prettier + ESLint config
+* [x] Consistent error formatting
+* [x] Friendly warnings (non-fatal)
 
 ---
 
@@ -281,8 +284,8 @@ Each theme:
 * [x] Changelog format
 * [x] `npm pack` dry-run for each publishable package
 * [x] `npm publish --dry-run` for each publishable package
-* [ ] Package size audit
-* [ ] Add `repository`, `bugs`, `homepage` fields (optional; set to your real repo URL)
+* [x] Package size audit
+* [x] Add `repository`, `bugs`, `homepage` fields (optional; set to your real repo URL)
 * [x] Basic smoke tests (`pnpm test`)
 
 ---

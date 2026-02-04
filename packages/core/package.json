@@ -1,8 +1,16 @@
 {
   "name": "@stubshot/core",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Stubshot core engine (config + provider loading + generation)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MadsenDev/stubshot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MadsenDev/stubshot/issues"
+  },
+  "homepage": "https://github.com/MadsenDev/stubshot#readme",
   "type": "module",
   "exports": {
     ".": "./dist/index.js"

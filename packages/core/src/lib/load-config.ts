@@ -18,6 +18,8 @@ function pickConfigShape(value: unknown): Partial<StubshotConfig> {
   if (out.outDir === undefined && typeof v.out === "string") out.outDir = v.out as string;
   if (out.startIndex === undefined && typeof v["start-index"] === "number") out.startIndex = v["start-index"] as number;
   if (out.dryRun === undefined && typeof v["dry-run"] === "boolean") out.dryRun = v["dry-run"] as boolean;
+  if (out.cacheDir === undefined && typeof v["cache-dir"] === "string") out.cacheDir = v["cache-dir"] as string;
+  if (out.cache === undefined && typeof v.cache === "boolean") out.cache = v.cache as boolean;
 
   return out;
 }
