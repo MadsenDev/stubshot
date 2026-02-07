@@ -281,6 +281,7 @@ Each theme:
 
 * [x] Choose license (MIT/Apache-2.0/etc) and add `LICENSE`
 * [x] Versioning strategy
+* [x] Versioning policy documented (`VERSIONING.md`)
 * [x] Changelog format
 * [x] `npm pack` dry-run for each publishable package
 * [x] `npm publish --dry-run` for each publishable package
@@ -315,3 +316,14 @@ The **true MVP** is:
 * sane output
 
 Everything else is optional ambition.
+
+---
+
+## Icons Provider (`@stubshot/provider-icons`) [Optional]
+
+* [x] Separate package
+* [x] Environment-based directory config (`STUBSHOT_ICONS_DIR`)
+* [x] Deterministic icon selection (given same dir contents)
+* [x] SVG output
+* [x] PNG/JPG/WebP output (via `sharp`)
+* [x] Tests (determinism + png header)

@@ -1,0 +1,33 @@
+{
+  "name": "@stubshot/provider-icons",
+  "version": "0.1.0",
+  "description": "Directory-based SVG icon provider for Stubshot (renders svg/png/jpg/webp)",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  },
+  "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "test": "node --test ./test/*.test.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@stubshot/core": "workspace:*",
+    "@types/node": "^20.11.30",
+    "typescript": "^5.5.4"
+  }
+}

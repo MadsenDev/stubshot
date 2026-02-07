@@ -205,7 +205,7 @@ export async function main(argv: string[]): Promise<void> {
     .description("List known provider names and whether they are installed")
     .option("--json", "Output as JSON", false)
     .action(async (opts) => {
-      const known = ["local", "openai"];
+      const known = ["local", "icons", "openai"];
       const results: Array<{ name: string; installed: boolean; packageHint: string; error?: string }> = [];
 
       for (const name of known) {

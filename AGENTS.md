@@ -1,1 +1,2 @@
 - When making changes, remember to update TODO.md and CHANGELOG.md
+- When changing/bumping versions, keep in mind VERSIONING.md

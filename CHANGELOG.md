@@ -6,6 +6,12 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## Unreleased
 
+### Added
+
+- Versioning policy document (`VERSIONING.md`)
+- Optional icons provider package (`@stubshot/provider-icons`) for directory-based SVG icon placeholders
+- Versioning: new packages start at `0.1.0` (provider-icons begins at `0.1.0`)
+
 ## 0.1.2 - 2026-02-04
 
 ### Added

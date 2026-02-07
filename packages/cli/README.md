@@ -26,6 +26,14 @@ Then run:
 stubshot generate --provider openai --format png --out public/placeholders --count 4 --sizes 1024x1024 --theme mesh-gradient --seed my-project
 ```
 
+You can also install an icon-based provider (directory-based SVG icons):
+
+```bash
+npm i -D @stubshot/provider-icons
+export STUBSHOT_ICONS_DIR=./stubshot-icons
+stubshot generate --provider icons --format png --out public/placeholders --count 8 --sizes 512x512 --seed my-project
+```
+
 ## Provider discovery
 
 List known providers and whether they’re installed:
